@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "seatserve-backend"
+version = "0.1.0"
+description = "FastAPI backend for SeatServe, backed by Supabase Postgres"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = ">=0.115"
+uvicorn = {extras = ["standard"], version = ">=0.32"}
+sqlalchemy = ">=2.0.36"
+asyncpg = ">=0.30"
+alembic = ">=1.14"
+pydantic = ">=2.10"
+pydantic-settings = ">=2.6"
+python-jose = {extras = ["cryptography"], version = ">=3.3"}
+python-multipart = ">=0.0.20"
+# Used by the Razorpay provider adapter to call the payments API, not just by tests.
+httpx = ">=0.28"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.3"
+pytest-asyncio = ">=0.24"
+aiosqlite = ">=0.20"
+
+[build-system]
+requires = ["poetry-core>=2.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
