@@ -37,3 +37,7 @@ class QRCodeRepository:
         await self.db.commit()
         await self.db.refresh(qr_code)
         return qr_code
+
+    async def delete(self, qr_code: QRCode) -> None:
+        await self.db.delete(qr_code)
+        await self.db.commit()

@@ -111,3 +111,15 @@ async def get_current_user(
         for invite in await staff_roles.list_pending_invites_for_email(email):
             await staff_roles.link_user(invite, user_id=user.id)
     return user
+
+
+async def get_current_platform_admin(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Dependency that requires the user to be a platform admin (super admin)."""
+    if not current_user.is_platform_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Platform admin access required"
+        )
+    return current_user

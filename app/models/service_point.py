@@ -36,7 +36,7 @@ class ServicePoint(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     business_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("businesses.id"), index=True)
-    area_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("service_areas.id"), index=True)
+    area_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("service_areas.id", ondelete="CASCADE"), index=True)
     code: Mapped[str] = mapped_column(String(50))
     kind: Mapped[ServicePointKind] = mapped_column(Enum(ServicePointKind, native_enum=False))
     label: Mapped[str] = mapped_column(String(200), default="")

@@ -12,10 +12,38 @@ class BusinessRepository:
         self.db = db
 
     async def create(
-        self, *, tenant_id: uuid.UUID, name: str, emoji: str, business_type: BusinessType, city: str
+        self,
+        *,
+        tenant_id: uuid.UUID,
+        name: str,
+        emoji: str,
+        business_type: BusinessType,
+        city: str,
+        description: str | None = None,
+        phone: str | None = None,
+        currency: str = "INR",
+        address_line1: str | None = None,
+        state: str | None = None,
+        postal_code: str | None = None,
+        country: str | None = None,
+        logo_url: str | None = None,
+        website: str | None = None,
     ) -> Business:
         business = Business(
-            tenant_id=tenant_id, name=name, emoji=emoji, business_type=business_type, city=city
+            tenant_id=tenant_id,
+            name=name,
+            emoji=emoji,
+            business_type=business_type,
+            city=city,
+            description=description,
+            phone=phone,
+            currency=currency,
+            address_line1=address_line1,
+            state=state,
+            postal_code=postal_code,
+            country=country,
+            logo_url=logo_url,
+            website=website,
         )
         self.db.add(business)
         await self.db.commit()
@@ -36,3 +64,16 @@ class BusinessRepository:
             .where(StaffBusinessRole.user_id == user_id)
         )
         return list(result.scalars().all())
+
+    async def update(self, business_id: uuid.UUID, **kwargs) -> Business:
+        business = await self.get(business_id)
+        if business is None:
+            raise ValueError(f"Business {business_id} not found")
+        
+        for key, value in kwargs.items():
+            if hasattr(business, key):
+                setattr(business, key, value)
+        
+        await self.db.commit()
+        await self.db.refresh(business)
+        return business

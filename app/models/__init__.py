@@ -19,6 +19,7 @@ from app.models.service_point import ServiceArea, ServicePoint, ServicePointKind
 from app.models.staff_business_role import StaffBusinessRole, StaffStatus
 from app.models.tenant import Tenant
 from app.models.user import User
+from app.models.venue import Venue, VenueType
 
 __all__ = [
     "Business",
@@ -55,4 +56,6 @@ __all__ = [
     "Subscription",
     "Invoice",
     "InvoiceStatus",
+    "Venue",
+    "VenueType",
 ]

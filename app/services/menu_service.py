@@ -20,6 +20,18 @@ class MenuService:
     async def list_categories(self, business_id: uuid.UUID) -> list[MenuCategory]:
         return await self.categories.list_for_business(business_id)
 
+    async def update_category(self, *, business_id: uuid.UUID, category_id: uuid.UUID, name: str | None, sort_order: int | None) -> MenuCategory:
+        category = await self._get_category_for_business(business_id=business_id, category_id=category_id)
+        return await self.categories.update(category, name=name, sort_order=sort_order)
+
+    async def delete_category(self, *, business_id: uuid.UUID, category_id: uuid.UUID) -> None:
+        category = await self._get_category_for_business(business_id=business_id, category_id=category_id)
+        # Check if category has items
+        items = await self.items.list_for_category(category_id)
+        if items:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete category with items. Please delete or move items first.")
+        await self.categories.delete(category)
+
     async def _get_category_for_business(self, *, business_id: uuid.UUID, category_id: uuid.UUID) -> MenuCategory:
         category = await self.categories.get(category_id)
         if category is None or category.business_id != business_id:

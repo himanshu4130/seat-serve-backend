@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import (
     analytics,
@@ -15,6 +16,8 @@ from app.api.v1 import (
     qr,
     service_points,
     staff,
+    upload,
+    venues,
     webhooks,
 )
 from app.core.config import get_settings
@@ -31,6 +34,13 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Serve uploaded files
+    upload_dir = settings.upload_dir
+    import os
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
 
     app.include_router(health.router, tags=["health"])
     app.include_router(me.router, prefix="/api/v1", tags=["me"])
@@ -55,6 +65,8 @@ def create_app() -> FastAPI:
     app.include_router(platform.router, prefix="/api/v1/platform", tags=["platform"])
     app.include_router(public.router, prefix="/api/v1/public", tags=["public"])
     app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["webhooks"])
+    app.include_router(upload.router, prefix="/api/v1/upload", tags=["upload"])
+    app.include_router(venues.router, prefix="/api/v1/businesses/{business_id}/venues", tags=["venues"])
 
     return app
 

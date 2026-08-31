@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     razorpay_key_secret: str = ""
     razorpay_webhook_secret: str = ""
 
+    # File upload settings
+    upload_dir: str = "./uploads"
+    max_upload_size_mb: int = 5
+    allowed_image_types: str = "image/jpeg,image/png,image/webp,image/gif"
+
     @property
     def razorpay_configured(self) -> bool:
         return bool(self.razorpay_key_id and self.razorpay_key_secret)

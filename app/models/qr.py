@@ -19,7 +19,7 @@ class QRCode(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     business_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("businesses.id"), index=True)
     service_point_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("service_points.id"), unique=True, index=True
+        ForeignKey("service_points.id", ondelete="CASCADE"), unique=True, index=True
     )
     # The future `/v/{tenantSlug}/{servicePoint}` routing key (Phase 4 on the
     # frontend) — already the canonical public lookup key here so that route

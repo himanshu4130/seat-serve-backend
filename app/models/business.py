@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from enum import StrEnum
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
@@ -41,6 +41,20 @@ class Business(Base):
     emoji: Mapped[str] = mapped_column(String(16), default="🏢")
     business_type: Mapped[BusinessType] = mapped_column(Enum(BusinessType, native_enum=False))
     city: Mapped[str] = mapped_column(String(200), default="")
+    description: Mapped[str] = mapped_column(Text, nullable=True)
+    phone: Mapped[str] = mapped_column(String(50), nullable=True)
+    currency: Mapped[str] = mapped_column(String(3), default="INR")
+    
+    # Address fields
+    address_line1: Mapped[str] = mapped_column(String(500), nullable=True)
+    state: Mapped[str] = mapped_column(String(200), nullable=True)
+    postal_code: Mapped[str] = mapped_column(String(20), nullable=True)
+    country: Mapped[str] = mapped_column(String(200), nullable=True)
+    
+    # Branding
+    logo_url: Mapped[str] = mapped_column(String(500), nullable=True)
+    website: Mapped[str] = mapped_column(String(500), nullable=True)
+    
     subscription_state: Mapped[SubscriptionState] = mapped_column(
         Enum(SubscriptionState, native_enum=False), default=SubscriptionState.TRIAL
     )
@@ -50,6 +64,12 @@ class Business(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     tenant = relationship("Tenant", back_populates="businesses")
     staff_roles = relationship("StaffBusinessRole", back_populates="business")
+    venues = relationship("Venue", back_populates="business")

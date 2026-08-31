@@ -17,6 +17,7 @@ python-jose = {extras = ["cryptography"], version = ">=3.3"}
 python-multipart = ">=0.0.20"
 # Used by the Razorpay provider adapter to call the payments API, not just by tests.
 httpx = ">=0.28"
+greenlet = "^3.5.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3"

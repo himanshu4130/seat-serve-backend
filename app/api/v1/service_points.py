@@ -37,6 +37,28 @@ async def create_area(
     return ServiceAreaOut.model_validate(area)
 
 
+@router.patch("/areas/{area_id}", response_model=ServiceAreaOut)
+async def update_area(
+    business_id: uuid.UUID,
+    area_id: uuid.UUID,
+    payload: ServiceAreaCreate,
+    _=Depends(require_business_permission(Permission.QR_MANAGE)),
+    service: ServicePointService = Depends(get_service_point_service),
+) -> ServiceAreaOut:
+    area = await service.update_area(business_id=business_id, area_id=area_id, name=payload.name)
+    return ServiceAreaOut.model_validate(area)
+
+
+@router.delete("/areas/{area_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_area(
+    business_id: uuid.UUID,
+    area_id: uuid.UUID,
+    _=Depends(require_business_permission(Permission.QR_MANAGE)),
+    service: ServicePointService = Depends(get_service_point_service),
+) -> None:
+    await service.delete_area(business_id=business_id, area_id=area_id)
+
+
 @router.get("/points", response_model=list[ServicePointOut])
 async def list_points(
     business_id: uuid.UUID,
@@ -70,3 +92,32 @@ async def set_point_active(
 ) -> ServicePointOut:
     point = await service.set_active(business_id=business_id, point_id=point_id, active=payload.active)
     return ServicePointOut.model_validate(point)
+
+
+@router.patch("/points/{point_id}/update", response_model=ServicePointOut)
+async def update_point(
+    business_id: uuid.UUID,
+    point_id: uuid.UUID,
+    payload: ServicePointCreate,
+    _=Depends(require_business_permission(Permission.QR_MANAGE)),
+    service: ServicePointService = Depends(get_service_point_service),
+) -> ServicePointOut:
+    point = await service.update_point(
+        business_id=business_id, 
+        point_id=point_id, 
+        code=payload.code, 
+        area_id=payload.area_id, 
+        kind=payload.kind, 
+        label=payload.label
+    )
+    return ServicePointOut.model_validate(point)
+
+
+@router.delete("/points/{point_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_point(
+    business_id: uuid.UUID,
+    point_id: uuid.UUID,
+    _=Depends(require_business_permission(Permission.QR_MANAGE)),
+    service: ServicePointService = Depends(get_service_point_service),
+) -> None:
+    await service.delete_point(business_id=business_id, point_id=point_id)

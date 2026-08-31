@@ -13,6 +13,7 @@ class Role(StrEnum):
     MANAGER = "MANAGER"
     KITCHEN = "KITCHEN"
     STAFF = "STAFF"
+    WAITER = "WAITER"
     DELIVERY = "DELIVERY"
 
 
@@ -68,6 +69,7 @@ ROLE_PERMISSIONS: dict[Role, set[Permission]] = {
         Permission.QR_MANAGE,
     },
     Role.KITCHEN: {Permission.ORDERS_VIEW, Permission.ORDERS_MANAGE},
+    Role.WAITER: {Permission.ORDERS_VIEW, Permission.MENU_VIEW},
     Role.STAFF: {Permission.ORDERS_VIEW, Permission.ORDERS_MANAGE, Permission.MENU_VIEW},
     Role.DELIVERY: {Permission.ORDERS_VIEW, Permission.ORDERS_MANAGE},
 }

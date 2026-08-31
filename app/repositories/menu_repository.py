@@ -29,6 +29,19 @@ class MenuCategoryRepository:
         )
         return list(result.scalars().all())
 
+    async def update(self, category: MenuCategory, *, name: str | None = None, sort_order: int | None = None) -> MenuCategory:
+        if name is not None:
+            category.name = name
+        if sort_order is not None:
+            category.sort_order = sort_order
+        await self.db.commit()
+        await self.db.refresh(category)
+        return category
+
+    async def delete(self, category: MenuCategory) -> None:
+        await self.db.delete(category)
+        await self.db.commit()
+
 
 class MenuItemRepository:
     def __init__(self, db: AsyncSession):
@@ -71,6 +84,14 @@ class MenuItemRepository:
             .where(MenuItem.business_id == business_id)
             .options(selectinload(MenuItem.addons))
             .order_by(MenuItem.name)
+        )
+        return list(result.scalars().all())
+
+    async def list_for_category(self, category_id: uuid.UUID) -> list[MenuItem]:
+        result = await self.db.execute(
+            select(MenuItem)
+            .where(MenuItem.category_id == category_id)
+            .options(selectinload(MenuItem.addons))
         )
         return list(result.scalars().all())
 

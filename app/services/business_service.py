@@ -25,14 +25,42 @@ class BusinessService:
         self.subscriptions = SubscriptionRepository(db)
 
     async def create_business(
-        self, *, current_user: User, name: str, emoji: str, business_type: BusinessType, city: str
+        self,
+        *,
+        current_user: User,
+        name: str,
+        emoji: str,
+        business_type: BusinessType,
+        city: str,
+        description: str | None = None,
+        phone: str | None = None,
+        currency: str = "INR",
+        address_line1: str | None = None,
+        state: str | None = None,
+        postal_code: str | None = None,
+        country: str | None = None,
+        logo_url: str | None = None,
+        website: str | None = None,
     ) -> Business:
         # One tenant per user for now (matches the frontend's current model: a
         # single account owning several businesses). Multi-user tenants can be
         # layered on later without changing this shape.
         tenant = await self.tenants.create(name=f"{name} Tenant", owner_user_id=current_user.id)
         business = await self.businesses.create(
-            tenant_id=tenant.id, name=name, emoji=emoji, business_type=business_type, city=city
+            tenant_id=tenant.id,
+            name=name,
+            emoji=emoji,
+            business_type=business_type,
+            city=city,
+            description=description,
+            phone=phone,
+            currency=currency,
+            address_line1=address_line1,
+            state=state,
+            postal_code=postal_code,
+            country=country,
+            logo_url=logo_url,
+            website=website,
         )
         await self.staff_roles.add(
             user_id=current_user.id,
@@ -69,3 +97,14 @@ class BusinessService:
         if current_user.is_platform_admin:
             return Role.SUPER_ADMIN
         return await self.staff_roles.get_role(user_id=current_user.id, business_id=business_id)
+
+    async def update_business(
+        self,
+        *,
+        current_user: User,
+        business_id: uuid.UUID,
+        **kwargs,
+    ) -> Business:
+        business = await self.get_business_for_user(current_user=current_user, business_id=business_id)
+        updated = await self.businesses.update(business_id, **kwargs)
+        return updated

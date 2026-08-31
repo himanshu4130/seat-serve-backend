@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings, get_settings
 from app.core.db import get_db
 from app.core.permissions import Permission, role_has_permission
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_platform_admin
 from app.models.user import User
 from app.services.analytics_service import AnalyticsService
 from app.services.billing_service import BillingService
@@ -99,7 +99,5 @@ def require_business_permission(permission: Permission):
     return dependency
 
 
-async def require_platform_admin(current_user: User = Depends(get_current_user)) -> User:
-    if not current_user.is_platform_admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Platform admin only")
+async def require_platform_admin(current_user: User = Depends(get_current_platform_admin)) -> User:
     return current_user

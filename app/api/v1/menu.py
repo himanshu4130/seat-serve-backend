@@ -31,6 +31,28 @@ async def create_category(
     return MenuCategoryOut.model_validate(category)
 
 
+@router.patch("/categories/{category_id}", response_model=MenuCategoryOut)
+async def update_category(
+    business_id: uuid.UUID,
+    category_id: uuid.UUID,
+    payload: MenuCategoryCreate,
+    _=Depends(require_business_permission(Permission.MENU_MANAGE)),
+    service: MenuService = Depends(get_menu_service),
+) -> MenuCategoryOut:
+    category = await service.update_category(business_id=business_id, category_id=category_id, name=payload.name, sort_order=payload.sort_order)
+    return MenuCategoryOut.model_validate(category)
+
+
+@router.delete("/categories/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_category(
+    business_id: uuid.UUID,
+    category_id: uuid.UUID,
+    _=Depends(require_business_permission(Permission.MENU_MANAGE)),
+    service: MenuService = Depends(get_menu_service),
+) -> None:
+    await service.delete_category(business_id=business_id, category_id=category_id)
+
+
 @router.get("/items", response_model=list[MenuItemOut])
 async def list_items(
     business_id: uuid.UUID,
